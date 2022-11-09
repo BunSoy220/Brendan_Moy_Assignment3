@@ -10,11 +10,6 @@
 #include <cstring>
 #include "quadratic_probing.h"
 
-
-
-
-
-
 // Quadratic probing implementation.
 template <typename HashedObj>
 class LinearHashTable {

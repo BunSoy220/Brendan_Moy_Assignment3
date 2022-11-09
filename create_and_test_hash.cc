@@ -21,7 +21,7 @@ using namespace std;
 // @query_filename: a filename of input words to test the hash table
 
 
-vector<string> getFileStrings(const string &filename){
+vector<string>& getFileStrings(const string &filename){
     ifstream fin;
     fin.open(filename, ios::in);
     if (fin.fail()) {
