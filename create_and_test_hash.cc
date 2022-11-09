@@ -39,16 +39,23 @@ vector<string> getFileStrings(const string &filename){
 template <typename HashTableType>
 void TestFunctionForHashTable(HashTableType& hash_table, const string &words_filename,const string &query_filename){
     hash_table.MakeEmpty();
+    vector<string>query = getFileStrings(query_filename);
     vector<string>list = getFileStrings(words_filename);
-    for(int i = 0; i < list.size(); ++i) {
+    for(int i = 0; i < list.size()-1; ++i) {
         hash_table.Insert(list.at(i));
     }
-    cout << "number_of_elements: " << hash_table.getSize();
-    //"size_of_table: "
-    //"load_factor: "
-    //"collisions: "
-    //"avg_collisions: "
 
+    cout << "number_of_elements: " << hash_table.getElements() <<endl;
+    cout << "size_of_table: " << hash_table.size()<<endl;
+    cout << "load_factor: " << float(hash_table.getElements())/hash_table.size()<<endl;
+    cout << "collisions: " << hash_table.getCollision()<<endl;
+    cout << "avg_collisions: " <<  (float(hash_table.getCollision())/float(hash_table.getElements()))<<endl;
+
+    cout <<endl;
+    for(int i = 0; i < query.size()-1; ++i) {
+        string res  = (hash_table.Contains(query.at(i)))?" Found ":" Not_Found ";
+        cout << query.at(i) << res  << hash_table.getProbes(query.at(i)) <<endl;
+    }
 }
 
 // @argument_count: argc as provided in main
@@ -65,13 +72,11 @@ int testHashingWrapper(int argument_count, char **argument_list) {
     }
 
     if (param_flag == "linear") {
-      // Uncomment below when you have implemented linear probing.
-      // HashTableLinear<string> linear_probing_table;
-      // TestFunctionForHashTable(linear_probing_table, words_filename,
-      // 			 query_filename);
+        LinearHashTable<string> linear_probing_table = LinearHashTable<string>();
+        TestFunctionForHashTable<LinearHashTable<string>>(linear_probing_table, words_filename, query_filename);
     } else if (param_flag == "quadratic") {
         HashTable<string> quadratic_probing_table = HashTable<string>();
-        TestFunctionForHashTable(quadratic_probing_table, words_filename, query_filename);
+        TestFunctionForHashTable<HashTable<string>>(quadratic_probing_table, words_filename, query_filename);
     } else if (param_flag == "double") {
 	cout << "r_value: " << R << endl;
         // Uncomment below when you have implemented double hashing.
