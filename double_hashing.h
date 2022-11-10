@@ -10,25 +10,26 @@
 #include <cstring>
 #include "quadratic_probing.h"
 
-
-
-
-
-// Quadratic probing implementation.
 template <typename HashedObj>
-class HashTableDouble {
+class DoubleHashTable {
 public:
     enum EntryType {ACTIVE, EMPTY, DELETED};
 
-    explicit HashTableDouble(size_t size = 101) : array_(NextPrime(size))
+    explicit DoubleHashTable(size_t size = 101) : array_(NextPrime(size))
     { MakeEmpty(); }
 
-    bool Contains(const HashedObj & x) const {
+    bool Contains(const HashedObj & x) {
         return IsActive(FindPos(x));
+    }
+
+    const int getProbes(const HashedObj & x){
+        Contains(x);
+        return probes;
     }
 
     void MakeEmpty() {
         current_size_ = 0;
+        collision = 0;
         for (auto &entry : array_)
             entry.info_ = EMPTY;
     }
@@ -51,7 +52,7 @@ public:
     bool Insert(HashedObj && x) {
         // Insert x as active
         size_t current_pos = FindPos(x);
-        if (IsActive(current_pos))//is active
+        if (IsActive(current_pos))
             return false;
 
         array_[current_pos] = std::move(x);
@@ -60,8 +61,16 @@ public:
         // Rehash; see Section 5.5
         if (++current_size_ > array_.size() / 2)
             Rehash();
-
         return true;
+    }
+    const int& getCollision(){//getter for collision
+        return collision;
+    }
+    const auto size(){
+        return array_.size();
+    }
+    const size_t& getElements(){
+        return current_size_;
     }
 
     bool Remove(const HashedObj & x) {
@@ -71,6 +80,10 @@ public:
 
         array_[current_pos].info_ = DELETED;
         return true;
+    }
+
+    void setR(int in){
+        r = in;
     }
 
 private:
@@ -88,24 +101,24 @@ private:
 
     std::vector<HashEntry> array_;
     size_t current_size_;
-    int r_value;
+    int collision;
+    int probes;
+    int r;
 
     bool IsActive(size_t current_pos) const
     { return array_[current_pos].info_ == ACTIVE; }
 
-    size_t FindPos(const HashedObj & x) const {
-        size_t offset = 1;
-        size_t current_pos = InternalHash(x);
-
-        while (array_[current_pos].info_ != EMPTY &&
-               array_[current_pos].element_ != x) {
-            current_pos += offset;  // Compute ith probe.
-            offset += 2;
-            if (current_pos >= array_.size())
-                current_pos -= array_.size();
-        }
+    size_t FindPos(const HashedObj & x) {
+        size_t current_pos = InternalHash(x); //get data from hash
+        probes = 1;
+        while (array_[current_pos].info_ != EMPTY && array_[current_pos].element_ != x){
+            probes++;
+            collision++;//track collision count
+            current_pos = r-(current_pos%r);
+        }//end while
         return current_pos;
     }
+
 
     void Rehash() {
         std::vector<HashEntry> old_array = array_;

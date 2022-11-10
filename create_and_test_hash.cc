@@ -74,16 +74,15 @@ int testHashingWrapper(int argument_count, char **argument_list) {
 
     if (param_flag == "linear") {
         LinearHashTable<string> linear_probing_table = LinearHashTable<string>();
-        TestFunctionForHashTable<LinearHashTable<string>>(linear_probing_table, words_filename, query_filename);
+        TestFunctionForHashTable(linear_probing_table, words_filename, query_filename);
     } else if (param_flag == "quadratic") {
         HashTable<string> quadratic_probing_table = HashTable<string>();
-        TestFunctionForHashTable<HashTable<string>>(quadratic_probing_table, words_filename, query_filename);
+        TestFunctionForHashTable(quadratic_probing_table, words_filename, query_filename);
     } else if (param_flag == "double") {
-	cout << "r_value: " << R << endl;
-        // Uncomment below when you have implemented double hashing.
-	    // HashTableDouble<string> double_probing_table;
-	    // TestFunctionForHashTable(double_probing_table, words_filename,
-	// 			 query_filename);
+	    cout << "r_value: " << R << endl;
+        DoubleHashTable<string> double_probing_table;
+        double_probing_table.setR(R);
+        TestFunctionForHashTable(double_probing_table, words_filename, query_filename);
     } else {
 	cout << "Unknown tree type " << param_flag
 	     << " (User should provide linear, quadratic, or double)" << endl;
