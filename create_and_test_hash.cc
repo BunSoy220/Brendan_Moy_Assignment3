@@ -21,27 +21,27 @@ using namespace std;
 // @query_filename: a filename of input words to test the hash table
 
 
-vector<string> getFileStrings(const string &filename){
+void getFileStrings(vector<string>& result, const string &filename){
     ifstream fin;
     fin.open(filename, ios::in);
     if (fin.fail()) {
         cerr << "Could not open file " << filename << endl;
         exit(1);
     }
-    vector<string> result = vector<string>();
     string line;
     while (!fin.eof()) {//checks if file has content
         getline(fin, line);//gets line
         result.push_back(line);
     }
-    return result;
 }
 
 template <typename HashTableType>
 void TestFunctionForHashTable(HashTableType& hash_table, const string &words_filename,const string &query_filename){
     hash_table.MakeEmpty();
-    vector<string>query = getFileStrings(query_filename);
-    vector<string>list = getFileStrings(words_filename);
+    vector<string>query;
+    getFileStrings(query,query_filename);
+    vector<string>list;
+    getFileStrings(list, words_filename);
     for(int i = 0; i < int(list.size()-1); ++i) {
         hash_table.Insert(list.at(i));
     }
@@ -55,7 +55,7 @@ void TestFunctionForHashTable(HashTableType& hash_table, const string &words_fil
     cout <<endl;
     for(int i = 0; i < int(query.size()-1); ++i) {
         string res  = (hash_table.Contains(query.at(i)))?" Found ":" Not_Found ";
-        cout << query.at(i) << res  << hash_table.getProbes(query.at(i)) <<endl;
+        cout << query[i]<< res  << hash_table.getProbes(query.at(i)) <<endl;
     }
 }
 
@@ -68,10 +68,9 @@ int testHashingWrapper(int argument_count, char **argument_list) {
     const string param_flag(argument_list[3]);
     int R = 89;
     if (argument_count == 5) {
-	const string rvalue(argument_list[4]);
-	R = stoi(rvalue);
+        const string rvalue(argument_list[4]);
+        R = stoi(rvalue);
     }
-
     if (param_flag == "linear") {
         LinearHashTable<string> linear_probing_table = LinearHashTable<string>();
         TestFunctionForHashTable(linear_probing_table, words_filename, query_filename);
