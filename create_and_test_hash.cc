@@ -21,7 +21,7 @@ using namespace std;
 // @query_filename: a filename of input words to test the hash table
 
 
-vector<string>& getFileStrings(const string &filename){
+vector<string> getFileStrings(const string &filename){
     ifstream fin;
     fin.open(filename, ios::in);
     if (fin.fail()) {
@@ -36,12 +36,13 @@ vector<string>& getFileStrings(const string &filename){
     }
     return result;
 }
+
 template <typename HashTableType>
 void TestFunctionForHashTable(HashTableType& hash_table, const string &words_filename,const string &query_filename){
     hash_table.MakeEmpty();
     vector<string>query = getFileStrings(query_filename);
     vector<string>list = getFileStrings(words_filename);
-    for(int i = 0; i < list.size()-1; ++i) {
+    for(int i = 0; i < int(list.size()-1); ++i) {
         hash_table.Insert(list.at(i));
     }
 
@@ -52,7 +53,7 @@ void TestFunctionForHashTable(HashTableType& hash_table, const string &words_fil
     cout << "avg_collisions: " <<  (float(hash_table.getCollision())/float(hash_table.getElements()))<<endl;
 
     cout <<endl;
-    for(int i = 0; i < query.size()-1; ++i) {
+    for(int i = 0; i < int(query.size()-1); ++i) {
         string res  = (hash_table.Contains(query.at(i)))?" Found ":" Not_Found ";
         cout << query.at(i) << res  << hash_table.getProbes(query.at(i)) <<endl;
     }
