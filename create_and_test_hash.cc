@@ -1,11 +1,9 @@
-// YOUR NAME.
+//Brendan Moy
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <fstream>
 
 // Uncomment when you implemented linear probing & double hashing
-
 #include "linear_probing.h"
 #include "double_hashing.h"
 
@@ -15,13 +13,33 @@ using namespace std;
 
 
 // You can add more functions here
+void readSequences(const string &seq_filename, vector<string> &result){
+    ifstream fin;
+    fin.open(seq_filename, ios::in);
+    if (fin.fail()) {
+        cerr << "Could not open file " << seq_filename << endl;
+        exit(1);
+    }
+    string line;
+    while (!fin.eof()) {//checks if file has content
+        getline(fin,line);
+        //if(line.length() != 0 || line.length() !=1)
+        result.push_back(line);
+    }
+}
 
-// @hash_table: a hash table (can be linear, quadratic, or double)
-// @words_filename: a filename of input words to construct the hash table
-// @query_filename: a filename of input words to test the hash table
-
-
-void getFileStrings(vector<string>& result, const string &filename){
+template <typename HashTableType>
+void findInputs(vector<string> &query, HashTableType& library){
+    for(size_t i = 0; i < query.size(); ++i){
+         library.ResetCollisions();
+         cout << query.at(i);
+         if(library.Contains(query.at(i))) 
+             cout << " Found " << library.Collisions() << endl;
+         else 
+             cout << " Not_Found " << library.Collisions() << endl;
+    }
+}
+void readFile(const string &filename, vector<string> &result){
     ifstream fin;
     fin.open(filename, ios::in);
     if (fin.fail()) {
@@ -30,33 +48,39 @@ void getFileStrings(vector<string>& result, const string &filename){
     }
     string line;
     while (!fin.eof()) {//checks if file has content
-        getline(fin, line);//gets line
-        result.push_back(line);
+        getline(fin,line);
+        if(line != "")result.push_back(line);
     }
 }
 
 template <typename HashTableType>
-void TestFunctionForHashTable(HashTableType& hash_table, const string &words_filename,const string &query_filename){
+void insertVector(vector<string> &input, HashTableType& target){
+    for(size_t i = 0; i < input.size(); ++i){
+        target.Insert(input.at(i));
+    }
+}
+// @hash_table: a hash table (can be linear, quadratic, or double)
+// @words_filename: a filename of input words to construct the hash table
+// @query_filename: a filename of input words to test the hash table
+template <typename HashTableType>
+void TestFunctionForHashTable(HashTableType &hash_table,
+			      const string &words_filename,
+			      const string &query_filename) {
     hash_table.MakeEmpty();
-    vector<string>query;
-    getFileStrings(query,query_filename);
-    vector<string>list;
-    getFileStrings(list, words_filename);
-    for(int i = 0; i < int(list.size()-1); ++i) {
-        hash_table.Insert(list.at(i));
-    }
-
-    cout << "number_of_elements: " << hash_table.getElements() <<endl;
-    cout << "size_of_table: " << hash_table.size()<<endl;
-    cout << "load_factor: " << float(hash_table.getElements())/hash_table.size()<<endl;
-    cout << "collisions: " << hash_table.getCollision()<<endl;
-    cout << "avg_collisions: " <<  (float(hash_table.getCollision())/float(hash_table.getElements()))<<endl;
-
-    cout <<endl;
-    for(int i = 0; i < int(query.size()-1); ++i) {
-        string res  = (hash_table.Contains(query.at(i)))?" Found ":" Not_Found ";
-        cout << query[i]<< res  << hash_table.getProbes(query.at(i)) <<endl;
-    }
+    vector<string> words = vector<string>();
+    vector<string> query = vector<string>();
+    readFile(words_filename, words);
+    insertVector(words, hash_table);
+    cout << "number_of_elements: " << hash_table.Elements()<< endl;
+    cout << "size_of_table: " << hash_table.Size() << endl;
+    cout << "load_factor: " << hash_table.LoadFactor() << endl;
+    cout << "collisions: " << hash_table.Collisions() << endl;
+    cout << "avg_collisions: " << float(hash_table.Collisions())/float(hash_table.Elements()) << endl;
+    readFile(query_filename, query);
+    // for(size_t i = 0; i < query.size(); ++i){
+    //     cout << query.at(i) << endl;
+    // }
+    findInputs(query, hash_table);
 }
 
 // @argument_count: argc as provided in main
@@ -68,20 +92,25 @@ int testHashingWrapper(int argument_count, char **argument_list) {
     const string param_flag(argument_list[3]);
     int R = 89;
     if (argument_count == 5) {
-        const string rvalue(argument_list[4]);
-        R = stoi(rvalue);
+	const string rvalue(argument_list[4]);
+	R = stoi(rvalue);
     }
+
     if (param_flag == "linear") {
-        LinearHashTable<string> linear_probing_table = LinearHashTable<string>();
-        TestFunctionForHashTable(linear_probing_table, words_filename, query_filename);
+      // Uncomment below when you have implemented linear probing.
+      HashTableLinear<string> linear_probing_table;
+      TestFunctionForHashTable(linear_probing_table, words_filename,
+      			 query_filename);
     } else if (param_flag == "quadratic") {
-        HashTable<string> quadratic_probing_table = HashTable<string>();
+        HashTable<string> quadratic_probing_table;
         TestFunctionForHashTable(quadratic_probing_table, words_filename, query_filename);
     } else if (param_flag == "double") {
-	    cout << "r_value: " << R << endl;
-        DoubleHashTable<string> double_probing_table;
-        double_probing_table.setR(R);
-        TestFunctionForHashTable(double_probing_table, words_filename, query_filename);
+	 cout << "r_value: " << R << endl;
+        // Uncomment below when you have implemented double hashing.
+	 HashTableDouble<string> double_probing_table;
+     double_probing_table.SetR(R);
+	 TestFunctionForHashTable(double_probing_table, words_filename,
+	 			 query_filename);
     } else {
 	cout << "Unknown tree type " << param_flag
 	     << " (User should provide linear, quadratic, or double)" << endl;

@@ -4,7 +4,6 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
-#include <cstring>
 
 namespace {
 
@@ -12,12 +11,14 @@ namespace {
 bool IsPrime(size_t n) {
   if( n == 2 || n == 3 )
     return true;
+  
   if( n == 1 || n % 2 == 0 )
     return false;
+  
   for( int i = 3; i * i <= n; i += 2 )
     if( n % i == 0 )
       return false;
-
+  
   return true;
 }
 
@@ -25,8 +26,8 @@ bool IsPrime(size_t n) {
 // Internal method to return a prime number at least as large as n.
 int NextPrime(size_t n) {
   if (n % 2 == 0)
-    ++n;
-  while (!IsPrime(n)) n += 2;
+    ++n;  
+  while (!IsPrime(n)) n += 2;  
   return n;
 }
 
@@ -45,17 +46,12 @@ class HashTable {
   bool Contains(const HashedObj & x) {
     return IsActive(FindPos(x));
   }
-
-  const int getProbes(const HashedObj & x){
-      Contains(x);
-      return probes;
-  }
   
   void MakeEmpty() {
     current_size_ = 0;
-    collision = 0;
     for (auto &entry : array_)
       entry.info_ = EMPTY;
+    collisions_ = 0;
   }
 
   bool Insert(const HashedObj & x) {
@@ -67,7 +63,7 @@ class HashTable {
     array_[current_pos].element_ = x;
     array_[current_pos].info_ = ACTIVE;
     
-    // Rehash; see Section 5.5
+    // Rehash; see Section 5.5, if table is half full resize
     if (++current_size_ > array_.size() / 2)
       Rehash();    
     return true;
@@ -82,19 +78,11 @@ class HashTable {
     array_[current_pos] = std::move(x);
     array_[current_pos].info_ = ACTIVE;
 
-    // Rehash; see Section 5.5
+    // Rehash; see Section 5.5 if hash table is half full resize
     if (++current_size_ > array_.size() / 2)
       Rehash();
+
     return true;
-  }
-  const int& getCollision(){//getter for collision
-      return collision;
-  }
-  const auto size(){
-      return array_.size();
-  }
-  const size_t& getElements(){
-      return current_size_;
   }
 
   bool Remove(const HashedObj & x) {
@@ -103,9 +91,29 @@ class HashTable {
       return false;
 
     array_[current_pos].info_ = DELETED;
+    //--current_size_;
     return true;
   }
 
+  size_t Elements(){
+      return current_size_;
+  }
+
+  size_t Size(){
+    return array_.size();
+  }
+
+  float LoadFactor(){
+    return float(current_size_)/float(array_.size());
+  }
+
+  int Collisions(){
+    return collisions_;
+  }
+
+  void ResetCollisions(){
+    collisions_ = 0;
+  }
  private:        
   struct HashEntry {
     HashedObj element_;
@@ -118,31 +126,29 @@ class HashTable {
     :element_{std::move(e)}, info_{ i } {}
   };
     
-
   std::vector<HashEntry> array_;
   size_t current_size_;
-  int collision;
-  int probes;
+  int collisions_;
 
+  //check if index is taken
   bool IsActive(size_t current_pos) const
   { return array_[current_pos].info_ == ACTIVE; }
-
-  size_t FindPos(const HashedObj & x) {
-    size_t offset = 1; //offset == 1
-    size_t current_pos = InternalHash(x); //get data from hash
-    probes = 1;
-    while (array_[current_pos].info_ != EMPTY && array_[current_pos].element_ != x){
-     probes++;
-      collision++;//track collision count
-      current_pos += offset;// Compute ith probe.
-      offset += 1;;// square offset
-
-      if (current_pos >= array_.size())
-	        current_pos -= array_.size();
-    }//end while
+  
+  //find open new position or new position for x
+  size_t FindPos(const HashedObj & x){
+    size_t offset = 1;
+    size_t current_pos = InternalHash(x);
+      
+    while (array_[current_pos].info_ != EMPTY && array_[current_pos].element_ != x) { 
+      current_pos += offset*offset;  // Compute ith probe.
+      offset++;
+      ++collisions_;
+      //if (current_pos >= array_.size()) //why can't it be 
+      current_pos = current_pos%array_.size();
+	      //current_pos -= array_.size();
+    }
     return current_pos;
   }
-
 
   void Rehash() {
     std::vector<HashEntry> old_array = array_;
@@ -156,12 +162,12 @@ class HashTable {
     current_size_ = 0;
     for (auto & entry :old_array)
       if (entry.info_ == ACTIVE)
-	Insert(std::move(entry.element_));
+	  Insert(std::move(entry.element_));
   }
   
   size_t InternalHash(const HashedObj & x) const {
     static std::hash<HashedObj> hf;
-    return hf(x) % array_.size( );
+    return hf(x) % array_.size( ); //return hash results
   }
 };
 
