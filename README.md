@@ -5,3 +5,4 @@
 ./create_and_test_hash words.txt query_words.txt quadratic
 ./create_and_test_hash words.txt query_words.txt double
 ./create_and_test_hash words.txt query_words.txt linear
+./spell_check document1.txt wordsEN.txt 

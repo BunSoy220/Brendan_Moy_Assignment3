@@ -31,12 +31,12 @@ void readSequences(const string &seq_filename, vector<string> &result){
 template <typename HashTableType>
 void findInputs(vector<string> &query, HashTableType& library){
     for(size_t i = 0; i < query.size(); ++i){
-         library.ResetCollisions();
-         cout << query.at(i);
+         library.ResetProbes();
+        //  string s = query.at(i).substr(0,query.at(i).size()-1);
          if(library.Contains(query.at(i))) 
-             cout << " Found " << library.Collisions() << endl;
+            cout << query.at(i) << " Found " << library.GetProbes()<< endl;
          else 
-             cout << " Not_Found " << library.Collisions() << endl;
+            cout << query.at(i) << " Not_Found " << library.GetProbes() <<endl;
     }
 }
 void readFile(const string &filename, vector<string> &result){
@@ -77,6 +77,7 @@ void TestFunctionForHashTable(HashTableType &hash_table,
     cout << "collisions: " << hash_table.Collisions() << endl;
     cout << "avg_collisions: " << float(hash_table.Collisions())/float(hash_table.Elements()) << endl;
     readFile(query_filename, query);
+    cout << endl;
     // for(size_t i = 0; i < query.size(); ++i){
     //     cout << query.at(i) << endl;
     // }

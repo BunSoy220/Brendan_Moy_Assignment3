@@ -116,6 +116,16 @@ class HashTableDouble {
     collisions_ = 0;
   }
 
+
+  int GetProbes(){
+    return probes_;
+  }
+
+  void ResetProbes(){
+    probes_ = 0;
+  }
+
+
   void SetR(int r){
     r_ = r;
   }
@@ -136,6 +146,7 @@ class HashTableDouble {
   size_t current_size_;
   int collisions_;
   int r_;
+  int probes_;
   //check if index is taken
   bool IsActive(size_t current_pos) const
   { return array_[current_pos].info_ == ACTIVE; }
@@ -144,14 +155,20 @@ class HashTableDouble {
   size_t FindPos(const HashedObj & x){
     size_t offset = 1;
     size_t current_pos = InternalHash(x);
-      
+    ++probes_;
     while (array_[current_pos].info_ != EMPTY && array_[current_pos].element_ != x) { 
-      current_pos += offset*DoubleHash(x);  // Compute ith probe.
-      ++offset;
+      // current_pos += offset*DoubleHash(x);  // Compute ith probe.
+      // ++offset;
+      // ++collisions_;
+      // ++probes_;
+      // current_pos = current_pos%array_.size();
+
+      //linear
+      current_pos += offset;  // Compute ith probe.
+      offset += 1;
       ++collisions_;
-      //if (current_pos >= array_.size()) //why can't it be 
+      ++probes_;
       current_pos = current_pos%array_.size();
-	      //current_pos -= array_.size();
     }
     return current_pos;
   }
@@ -174,6 +191,7 @@ class HashTableDouble {
   size_t DoubleHash(const HashedObj & x){
     return size_t(r_-(int(InternalHash(x))%r_));
   }
+
   size_t InternalHash(const HashedObj & x) const {
     static std::hash<HashedObj> hf;
     return hf(x) % array_.size(); //return hash results

@@ -111,8 +111,13 @@ class HashTableLinear {
     return collisions_;
   }
 
-  void ResetCollisions(){
-    collisions_ = 0;
+
+  int GetProbes(){
+    return probes_;
+  }
+
+  void ResetProbes(){
+    probes_ = 0;
   }
 
  private:        
@@ -130,7 +135,7 @@ class HashTableLinear {
   std::vector<HashEntry> array_;
   size_t current_size_;
   int collisions_;
-
+  int probes_;
   //check if index is taken
   bool IsActive(size_t current_pos) const
   { return array_[current_pos].info_ == ACTIVE; }
@@ -139,11 +144,12 @@ class HashTableLinear {
   size_t FindPos(const HashedObj & x){
     size_t offset = 1;
     size_t current_pos = InternalHash(x);
-      
+    ++probes_;
     while (array_[current_pos].info_ != EMPTY && array_[current_pos].element_ != x) { 
       current_pos += offset;  // Compute ith probe.
       offset += 1;
       ++collisions_;
+      ++probes_;
       //if (current_pos >= array_.size()) //why can't it be 
       current_pos = current_pos%array_.size();
 	      //current_pos -= array_.size();
