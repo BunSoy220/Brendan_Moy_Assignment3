@@ -145,6 +145,7 @@ class HashTableLinear {
     size_t offset = 1;
     size_t current_pos = InternalHash(x);
     ++probes_;
+    ++collisions_;
     while (array_[current_pos].info_ != EMPTY && array_[current_pos].element_ != x) { 
       current_pos += offset;  // Compute ith probe.
       offset += 1;
