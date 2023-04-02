@@ -165,7 +165,7 @@ class HashTable {
     array_.resize(NextPrime(2 * old_array.size()));
     for (auto & entry : array_)
       entry.info_ = EMPTY;
-    
+    ++collisions_;
     // Copy table over.
     current_size_ = 0;
     for (auto & entry :old_array)
