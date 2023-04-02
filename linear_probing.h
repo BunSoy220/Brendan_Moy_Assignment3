@@ -1,5 +1,5 @@
-#ifndef QUADRATIC_PROBING_H
-#define QUADRATIC_PROBING_H
+#ifndef LINEAR_PROBING_H
+#define LINEAR_PROBING_H
 
 #include <vector>
 #include <algorithm>
@@ -8,7 +8,7 @@
 namespace {
 
 // Internal method to test if a positive number is prime.
-bool IsPrime(size_t n) {
+bool LinearIsPrime(size_t n) {
   if( n == 2 || n == 3 )
     return true;
   
@@ -24,10 +24,10 @@ bool IsPrime(size_t n) {
 
 
 // Internal method to return a prime number at least as large as n.
-int NextPrime(size_t n) {
+int LinearNextPrime(size_t n) {
   if (n % 2 == 0)
     ++n;  
-  while (!IsPrime(n)) n += 2;  
+  while (!LinearIsPrime(n)) n += 2;  
   return n;
 }
 
@@ -36,11 +36,11 @@ int NextPrime(size_t n) {
 
 // Quadratic probing implementation.
 template <typename HashedObj>
-class HashTable {
+class HashTableLinear {
  public:
   enum EntryType {ACTIVE, EMPTY, DELETED};
 
-  explicit HashTable(size_t size = 101) : array_(NextPrime(size))
+  explicit HashTableLinear(size_t size = 101) : array_(LinearNextPrime(size))
     { MakeEmpty(); }
   
   bool Contains(const HashedObj & x) {
@@ -51,7 +51,7 @@ class HashTable {
     current_size_ = 0;
     for (auto &entry : array_)
       entry.info_ = EMPTY;
-    collisions_ = 0; //reset collisions
+    collisions_ = 0;
   }
 
   bool Insert(const HashedObj & x) {
@@ -111,6 +111,7 @@ class HashTable {
     return collisions_;
   }
 
+
   int GetProbes(){
     return probes_;
   }
@@ -135,7 +136,6 @@ class HashTable {
   size_t current_size_;
   int collisions_;
   int probes_;
-
   //check if index is taken
   bool IsActive(size_t current_pos) const
   { return array_[current_pos].info_ == ACTIVE; }
@@ -144,11 +144,10 @@ class HashTable {
   size_t FindPos(const HashedObj & x){
     size_t offset = 1;
     size_t current_pos = InternalHash(x);
-    
     ++probes_;
     while (array_[current_pos].info_ != EMPTY && array_[current_pos].element_ != x) { 
-      current_pos += offset*offset;  // Compute ith probe.
-      offset++;
+      current_pos += offset;  // Compute ith probe.
+      offset += 1;
       ++collisions_;
       ++probes_;
       //if (current_pos >= array_.size()) //why can't it be 
@@ -162,10 +161,10 @@ class HashTable {
     std::vector<HashEntry> old_array = array_;
 
     // Create new double-sized, empty table.
-    array_.resize(NextPrime(2 * old_array.size()));
+    array_.resize(LinearNextPrime(2 * old_array.size()));
     for (auto & entry : array_)
       entry.info_ = EMPTY;
-    ++collisions_;
+    
     // Copy table over.
     current_size_ = 0;
     for (auto & entry :old_array)
@@ -179,4 +178,4 @@ class HashTable {
   }
 };
 
-#endif  // QUADRATIC_PROBING_H
+#endif  // LINEAR_PROBING_H

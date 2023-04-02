@@ -78,8 +78,9 @@ class HashTable {
     array_[current_pos] = std::move(x);
     array_[current_pos].info_ = ACTIVE;
 
-    if (current_pos >= array_.size()) 
-          current_pos -= array_.size();
+    // Rehash; see Section 5.5 if hash table is half full resize
+    if (++current_size_ > array_.size() / 2)
+      Rehash();
 
     return true;
   }
@@ -164,7 +165,7 @@ class HashTable {
     array_.resize(NextPrime(2 * old_array.size()));
     for (auto & entry : array_)
       entry.info_ = EMPTY;
-    ++collisions_;
+    
     // Copy table over.
     current_size_ = 0;
     for (auto & entry :old_array)
