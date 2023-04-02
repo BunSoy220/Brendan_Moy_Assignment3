@@ -144,9 +144,10 @@ class HashTableLinear {
   size_t FindPos(const HashedObj & x){
     size_t offset = 1;
     size_t current_pos = InternalHash(x);
+    size_t hash = current_pos;
     ++probes_;
     while (array_[current_pos].info_ != EMPTY && array_[current_pos].element_ != x) { 
-      current_pos += offset;  // Compute ith probe.
+      current_pos = hash + offset*offset;  // Compute ith probe.
       offset += 1;
       ++collisions_;
       ++probes_;

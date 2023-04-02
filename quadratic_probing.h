@@ -144,10 +144,10 @@ class HashTable {
   size_t FindPos(const HashedObj & x){
     size_t offset = 1;
     size_t current_pos = InternalHash(x);
-    
+    size_t hash = current_pos;
     ++probes_;
     while (array_[current_pos].info_ != EMPTY && array_[current_pos].element_ != x) { 
-      current_pos += offset*offset;  // Compute ith probe.
+      current_pos = hash + offset*offset;  // Compute ith probe.
       offset++;
       ++collisions_;
       ++probes_;
@@ -169,11 +169,8 @@ class HashTable {
     // Copy table over.
     current_size_ = 0;
     for (auto & entry :old_array)
-      if (entry.info_ == ACTIVE){
-        ++collisions_;
-        Insert(std::move(entry.element_));
-      }
-
+      if (entry.info_ == ACTIVE)
+	  Insert(std::move(entry.element_));
   }
   
   size_t InternalHash(const HashedObj & x) const {
