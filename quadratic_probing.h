@@ -169,8 +169,11 @@ class HashTable {
     // Copy table over.
     current_size_ = 0;
     for (auto & entry :old_array)
-      if (entry.info_ == ACTIVE)
-	  Insert(std::move(entry.element_));
+      if (entry.info_ == ACTIVE){
+        ++collisions_;
+        Insert(std::move(entry.element_));
+      }
+
   }
   
   size_t InternalHash(const HashedObj & x) const {
