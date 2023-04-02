@@ -165,7 +165,7 @@ class HashTableDouble {
 
       //linear
       current_pos += offset;  // Compute ith probe.
-      offset += 1;
+      ++offset;
       ++collisions_;
       ++probes_;
       current_pos = current_pos%array_.size();

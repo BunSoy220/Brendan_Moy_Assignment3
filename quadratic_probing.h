@@ -51,7 +51,7 @@ class HashTable {
     current_size_ = 0;
     for (auto &entry : array_)
       entry.info_ = EMPTY;
-    collisions_ = 0;
+    collisions_ = 0; //reset collisions
   }
 
   bool Insert(const HashedObj & x) {
