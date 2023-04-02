@@ -147,12 +147,11 @@ class HashTableLinear {
     ++probes_;
     while (array_[current_pos].info_ != EMPTY && array_[current_pos].element_ != x) { 
       current_pos += offset;  // Compute ith probe.
-      offset += 1;
+      offset++;
       ++collisions_;
       ++probes_;
-      //if (current_pos >= array_.size()) //why can't it be 
-      current_pos = current_pos%array_.size();
-	      //current_pos -= array_.size();
+      if (current_pos >= array_.size()) 
+          current_pos -= array_.size();
     }
     return current_pos;
   }

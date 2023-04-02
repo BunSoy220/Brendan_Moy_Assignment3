@@ -78,9 +78,8 @@ class HashTable {
     array_[current_pos] = std::move(x);
     array_[current_pos].info_ = ACTIVE;
 
-    // Rehash; see Section 5.5 if hash table is half full resize
-    if (++current_size_ > array_.size() / 2)
-      Rehash();
+    if (current_pos >= array_.size()) 
+          current_pos -= array_.size();
 
     return true;
   }
