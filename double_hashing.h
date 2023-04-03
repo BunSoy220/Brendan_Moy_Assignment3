@@ -160,7 +160,6 @@ class HashTableDouble {
     ++probes_;
     while (array_[current_pos].info_ != EMPTY && array_[current_pos].element_ != x) { 
       current_pos = hash + (offset*rehash);
-      current_pos += offset;  // Compute ith probe.
       ++offset;
       ++collisions_;
       ++probes_;
