@@ -184,7 +184,7 @@ class HashTableDouble {
   //second function R - (x%R)
   size_t DoubleHash(HashedObj x){
     static std::hash<HashedObj> hf2;
-    return size_t(r_-((hf2(x) % array_.size())%r_));
+    return size_t(r_-(hf2(x)%r_));
   }
 
   size_t InternalHash(const HashedObj & x) const {
