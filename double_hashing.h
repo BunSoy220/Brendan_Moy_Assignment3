@@ -5,77 +5,90 @@
 #include <algorithm>
 #include <functional>
 
+namespace
+{
 
-namespace {
+  // Internal method to test if a positive number is prime.
+  bool DoubleIsPrime(size_t n)
+  {
+    if (n == 2 || n == 3)
+      return true;
 
-//Internal method to test if a positive number is prime.
-bool DoubleIsPrime(size_t n) {
-  if( n == 2 || n == 3 )
-    return true;
-  
-  if( n == 1 || n % 2 == 0 )
-    return false;
-  
-  for( int i = 3; i * i <= n; i += 2 )
-    if( n % i == 0 )
+    if (n == 1 || n % 2 == 0)
       return false;
-  
-  return true;
-}
 
+    for (int i = 3; i * i <= n; i += 2)
+      if (n % i == 0)
+        return false;
 
-// Internal method to return a prime number at least as large as n.
-int DoubleNextPrime(size_t n) {
-  if (n % 2 == 0)
-    ++n;  
-  while (!DoubleIsPrime(n)) n += 2;  
-  return n;
-}
+    return true;
+  }
 
-}  // namespace
+  // Internal method to return a prime number at least as large as n.
+  int DoubleNextPrime(size_t n)
+  {
+    if (n % 2 == 0)
+      ++n;
+    while (!DoubleIsPrime(n))
+      n += 2;
+    return n;
+  }
 
+} // namespace
 
 // Quadratic probing implementation.
 template <typename HashedObj>
-class HashTableDouble {
- public:
-  enum EntryType {ACTIVE, EMPTY, DELETED};
+class HashTableDouble
+{
+public:
+  enum EntryType
+  {
+    ACTIVE,
+    EMPTY,
+    DELETED
+  };
 
   explicit HashTableDouble(size_t size = 101) : array_(DoubleNextPrime(size))
-    { MakeEmpty(); }
-  
-  bool Contains(const HashedObj & x) {
+  {
+    MakeEmpty();
+  }
+
+  bool Contains(const HashedObj &x)
+  {
     return IsActive(FindPos(x));
   }
-  
-  void MakeEmpty() {
+
+  void MakeEmpty()
+  {
     current_size_ = 0;
     for (auto &entry : array_)
       entry.info_ = EMPTY;
     collisions_ = 0;
   }
 
-  bool Insert(const HashedObj & x) {
+  bool Insert(const HashedObj &x)
+  {
     // Insert x as active
     size_t current_pos = FindPos(x);
     if (IsActive(current_pos))
       return false;
-    
+
     array_[current_pos].element_ = x;
     array_[current_pos].info_ = ACTIVE;
-    
+
     // Rehash; see Section 5.5, if table is half full resize
     if (++current_size_ > array_.size() / 2)
-      Rehash();    
+      Rehash();
     return true;
   }
-    
-  bool Insert(HashedObj && x) {
+
+  bool Insert(HashedObj &&x)
+  {
     // Insert x as active
     size_t current_pos = FindPos(x);
     if (IsActive(current_pos))
       return false;
-    
+
     array_[current_pos] = std::move(x);
     array_[current_pos].info_ = ACTIVE;
 
@@ -86,7 +99,8 @@ class HashTableDouble {
     return true;
   }
 
-  bool Remove(const HashedObj & x) {
+  bool Remove(const HashedObj &x)
+  {
     size_t current_pos = FindPos(x);
     if (!IsActive(current_pos))
       return false;
@@ -96,101 +110,115 @@ class HashTableDouble {
     return true;
   }
 
-  size_t Elements(){
-      return current_size_;
+  size_t Elements()
+  {
+    return current_size_;
   }
 
-  size_t Size(){
+  size_t Size()
+  {
     return array_.size();
   }
 
-  float LoadFactor(){
-    return float(current_size_)/float(array_.size());
+  float LoadFactor()
+  {
+    return float(current_size_) / float(array_.size());
   }
 
-  int Collisions(){
+  int Collisions()
+  {
     return collisions_;
   }
 
-  void ResetCollisions(){
+  void ResetCollisions()
+  {
     collisions_ = 0;
   }
 
-
-  int GetProbes(){
+  int GetProbes()
+  {
     return probes_;
   }
 
-  void ResetProbes(){
+  void ResetProbes()
+  {
     probes_ = 0;
   }
 
-
-  void SetR(size_t r){
+  void SetR(size_t r)
+  {
     r_ = r;
   }
 
- private:        
-  struct HashEntry {
+private:
+  struct HashEntry
+  {
     HashedObj element_;
     EntryType info_;
-    
-    HashEntry(const HashedObj& e = HashedObj{}, EntryType i = EMPTY)
-    :element_{e}, info_{i} { }
-    
-    HashEntry(HashedObj && e, EntryType i = EMPTY)
-    :element_{std::move(e)}, info_{ i } {}
+
+    HashEntry(const HashedObj &e = HashedObj{}, EntryType i = EMPTY)
+        : element_{e}, info_{i} {}
+
+    HashEntry(HashedObj &&e, EntryType i = EMPTY)
+        : element_{std::move(e)}, info_{i} {}
   };
-    
+
   std::vector<HashEntry> array_;
   size_t current_size_;
   int collisions_ = 0;
   int probes_ = 0;
   size_t r_;
-  //check if index is taken
+  // check if index is taken
   bool IsActive(size_t current_pos) const
-  { return array_[current_pos].info_ == ACTIVE; }
-  
-  //find open new position or new position for x
-  size_t FindPos(const HashedObj & x){
+  {
+    return array_[current_pos].info_ == ACTIVE;
+  }
+
+  // find open new position or new position for x
+  size_t FindPos(const HashedObj &x)
+  {
     size_t offset = 1;
     size_t current_pos = InternalHash(x);
     size_t hash = current_pos;
     size_t rehash = DoubleHash(x);
     ++probes_;
-    while (array_[current_pos].info_ != EMPTY && array_[current_pos].element_ != x) { 
-      current_pos = hash + (offset*rehash);
+    while (array_[current_pos].info_ != EMPTY && array_[current_pos].element_ != x)
+    {
+      current_pos = hash + (offset * rehash);
       ++offset;
       ++collisions_;
       ++probes_;
-      current_pos = current_pos%array_.size();
+      current_pos = current_pos % array_.size();
     }
     return current_pos;
   }
 
-  void Rehash() {
+  void Rehash()
+  {
     std::vector<HashEntry> old_array = array_;
 
     // Create new double-sized, empty table.
     array_.resize(DoubleNextPrime(2 * old_array.size()));
-    for (auto & entry : array_)
+    for (auto &entry : array_)
       entry.info_ = EMPTY;
     // Copy table over.
     current_size_ = 0;
-    for (auto & entry :old_array)
+    for (auto &entry : old_array)
       if (entry.info_ == ACTIVE)
-	  Insert(std::move(entry.element_));
+        Insert(std::move(entry.element_));
   }
-  //second function R - (x%R)
-  size_t DoubleHash(HashedObj x){
+  // second function R - (x%R)
+  size_t DoubleHash(HashedObj x)
+  {
     static std::hash<HashedObj> hf2;
-    return size_t(r_-(hf2(x)%r_));
+    return size_t(r_ - (hf2(x) % r_));
   }
 
-  size_t InternalHash(const HashedObj & x) const {
+  size_t InternalHash(const HashedObj &x) const
+  {
     static std::hash<HashedObj> hf;
-    return hf(x) % array_.size(); //return hash results
+    return hf(x) % array_.size(); // return hash results
   }
 };
 
-#endif  // DOUBLE_HASHING_H
+#endif // DOUBLE_HASHING_H
