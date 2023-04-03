@@ -126,7 +126,7 @@ class HashTableDouble {
   }
 
 
-  void SetR(int r){
+  size_t SetR(size_t r){
     r_ = r;
   }
 
@@ -146,7 +146,7 @@ class HashTableDouble {
   size_t current_size_;
   int collisions_ = 0;
   int probes_ = 0;
-  int r_;
+  size_t r_;
   //check if index is taken
   bool IsActive(size_t current_pos) const
   { return array_[current_pos].info_ == ACTIVE; }
@@ -156,7 +156,7 @@ class HashTableDouble {
     size_t offset = 1;
     size_t current_pos = InternalHash(x);
     size_t hash = current_pos;
-    int rehash = DoubleHash(hash);
+    size_t rehash = DoubleHash(hash);
     ++probes_;
     while (array_[current_pos].info_ != EMPTY && array_[current_pos].element_ != x) { 
       current_pos = hash + (offset*rehash);
@@ -182,8 +182,8 @@ class HashTableDouble {
 	  Insert(std::move(entry.element_));
   }
   //second function R - (x%R)
-  int DoubleHash(size_t x){
-    return (r_-(x%r_));
+  size_t DoubleHash(size_t x){
+    return size_t(r_-(x%r_));
   }
 
   size_t InternalHash(const HashedObj & x) const {
