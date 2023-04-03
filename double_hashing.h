@@ -155,15 +155,11 @@ class HashTableDouble {
   size_t FindPos(const HashedObj & x){
     size_t offset = 1;
     size_t current_pos = InternalHash(x);
+    size_t hash = current_pos;
+    size_t rehash = DoubleHash(hash);
     ++probes_;
     while (array_[current_pos].info_ != EMPTY && array_[current_pos].element_ != x) { 
-      // current_pos += offset*DoubleHash(x);  // Compute ith probe.
-      // ++offset;
-      // ++collisions_;
-      // ++probes_;
-      // current_pos = current_pos%array_.size();
-
-      //linear
+      current_pos = hash + (offset*rehash);
       current_pos += offset;  // Compute ith probe.
       ++offset;
       ++collisions_;
@@ -188,8 +184,8 @@ class HashTableDouble {
 	  Insert(std::move(entry.element_));
   }
   //second function R - (x%R)
-  size_t DoubleHash(const HashedObj & x){
-    return size_t(r_-(int(InternalHash(x))%r_));
+  size_t DoubleHash(size_t x){
+    return size_t(r_-(x%r_));
   }
 
   size_t InternalHash(const HashedObj & x) const {
