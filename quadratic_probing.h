@@ -133,8 +133,8 @@ class HashTable {
     
   std::vector<HashEntry> array_;
   size_t current_size_;
-  int collisions_;
-  int probes_;
+  int collisions_ = 0;
+  int probes_ = 0;
 
   //check if index is taken
   bool IsActive(size_t current_pos) const
