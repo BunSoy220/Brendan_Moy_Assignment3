@@ -99,6 +99,7 @@ void Correction(string s, HashTableDouble<string>& dictionary){
 // dictionary_file
 HashTableDouble<string> MakeDictionary(const string &dictionary_file) {
   HashTableDouble<string> dictionary_hash;
+  dictionary_hash.SetR(89);
   vector<string> words = vector<string>();
   readFile(dictionary_file,words);
   for(size_t i = 0; i < words.size(); ++i){
@@ -144,7 +145,6 @@ int testSpellingWrapper(int argument_count, char** argument_list) {
     // Call functions implementing the assignment requirements.
     
     HashTableDouble<string> dictionary;
-    dictionary.SetR(89);
     dictionary = MakeDictionary(dictionary_filename);
     
     SpellChecker(dictionary, document_filename);
