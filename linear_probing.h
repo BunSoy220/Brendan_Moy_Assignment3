@@ -147,7 +147,7 @@ class HashTableLinear {
     size_t hash = current_pos;
     ++probes_;
     while (array_[current_pos].info_ != EMPTY && array_[current_pos].element_ != x) { 
-      current_pos = hash + offset*offset;  // Compute ith probe.
+      current_pos = hash + offset;  // Compute ith probe.
       offset += 1;
       ++collisions_;
       ++probes_;
