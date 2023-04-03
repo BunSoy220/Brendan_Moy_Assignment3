@@ -146,7 +146,7 @@ class HashTableDouble {
   size_t current_size_;
   int collisions_ = 0;
   int probes_ = 0;
-  int r;
+  int r_;
   //check if index is taken
   bool IsActive(size_t current_pos) const
   { return array_[current_pos].info_ == ACTIVE; }
