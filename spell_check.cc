@@ -142,8 +142,11 @@ int testSpellingWrapper(int argument_count, char** argument_list) {
     const string dictionary_filename(argument_list[2]);
 
     // Call functions implementing the assignment requirements.
-    HashTableDouble<string> dictionary = MakeDictionary(dictionary_filename);
+    
+    HashTableDouble<string> dictionary;
     dictionary.SetR(89);
+    dictionary = MakeDictionary(dictionary_filename);
+    
     SpellChecker(dictionary, document_filename);
 
     return 0;
